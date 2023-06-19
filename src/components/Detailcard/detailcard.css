@@ -1,0 +1,42 @@
+.container{
+    width: 100%;
+    height: max-content;
+}
+.horizontal_container{
+    display: flex;
+    /* align-items: center; */
+    width: 100%;
+    height: max-content;
+}
+.image_div{
+    align-self: center;
+    width: 15%;
+    display: flex;
+    justify-content: center;
+    height: max-content;
+}
+.avatar_detail_card{
+    height: 10vh;
+    width: 10vw;
+}
+.vertical_container{
+    width: 70%;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+.star_issue_lastpush{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.indetail_card_view{
+    display: flex;
+    justify-content: center;
+    width: 15%;
+}
+.right_arrow_image{
+    height: 10vh;
+    width: 5vw;
+    align-self: center;
+}
