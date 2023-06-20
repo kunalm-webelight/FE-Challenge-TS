@@ -1,15 +1,19 @@
 import { hover } from "@testing-library/user-event/dist/hover";
 import React from "react";
 import "./detailcard.css";
-interface mytype{
-    repoName:string
-    repoDesc:string
-    noStars:string
-    noIssues:string
-    pushTime:string
-    ownerName:string
+interface DetailCardProps{
+    repoName:string;
+    repoDesc:string;
+    noStars:string;
+    noIssues:string;
+    pushTime:string;
+    ownerName:string;
 }
-export default function DetailCard({repoName,repoDesc,noStars,noIssues,pushTime,ownerName}:mytype) {
+interface Props{
+  RepoDetails:DetailCardProps;
+}
+export default function DetailCard({RepoDetails}:Props) {
+  const {repoName,repoDesc,noStars,noIssues,pushTime,ownerName}=RepoDetails
   return (
     <div className="container">
       <div className="horizontal_container">

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { decrement,increment } from './mySlice'
+import { decrement,increment } from '../../redux/mySlice'
 
 interface mytypes {
     my:{
