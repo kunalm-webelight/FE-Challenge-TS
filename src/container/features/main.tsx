@@ -9,7 +9,7 @@ interface mytypes {
 }
 
 export default function Counter(){
-    const count = useSelector((state:mytypes)=>state.my.value);
+    const count = useSelector((state:mytypes)=>state.my?.value);
     const dispatch = useDispatch();
 
     return(

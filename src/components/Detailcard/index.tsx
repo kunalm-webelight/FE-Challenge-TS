@@ -1,36 +1,27 @@
-import { hover } from "@testing-library/user-event/dist/hover";
 import React from "react";
 import "./detailcard.css";
-interface DetailCardProps{
-    repoName:string;
-    repoDesc:string;
-    noStars:string;
-    noIssues:string;
-    pushTime:string;
-    ownerName:string;
-}
-interface Props{
-  RepoDetails:DetailCardProps;
-}
-export default function DetailCard({RepoDetails}:Props) {
-  const {repoName,repoDesc,noStars,noIssues,pushTime,ownerName}=RepoDetails
+// import { Button } from 'ws-project-core'
+
+
+export default function DetailCard({RepoDetails}:any) {
   return (
     <div className="container">
       <div className="horizontal_container">
         <div className="image_div">
         <img
-          src="https://ionicframework.com/docs/img/demos/avatar.svg"
+          src={RepoDetails.owner.avatar_url}
           alt=""
           className="avatar_detail_card"
         />
         </div>
+        {/* <Button title="ddsssssssssssssss" /> */}
         <div className="vertical_container">
-          <h1>{repoName}</h1>
-          <h4>{repoDesc}</h4>
+          <h1>{RepoDetails.name}</h1>
+          <h4>{RepoDetails.description}</h4>
           <div className="star_issue_lastpush">
-            <h5>{noStars}</h5>
-            <h5>{noIssues}</h5>
-            <h5>Last pushed on {pushTime} by {ownerName}</h5>
+            <h5>Stars : {RepoDetails.stargazers_count}</h5>
+            <h5>Issues : {RepoDetails.open_issues_count}</h5>
+            <h5>Last pushed : {RepoDetails.pushed_at} by {RepoDetails.owner.login}</h5>
           </div>
         </div>
         <div className="indetail_card_view">
