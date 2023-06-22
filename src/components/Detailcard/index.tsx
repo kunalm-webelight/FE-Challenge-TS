@@ -1,27 +1,28 @@
 import React from "react";
 import "./detailcard.css";
-// import { Button } from 'ws-project-core'
 
 
 export default function DetailCard({RepoDetails}:any) {
+  console.log()
+  const {avatarUrl,name,description,stargazersCount,openIssuesCount,pushedAt,login} = RepoDetails || {}
+
   return (
     <div className="container">
       <div className="horizontal_container">
         <div className="image_div">
         <img
-          src={RepoDetails.owner.avatar_url}
+          src={avatarUrl}
           alt=""
           className="avatar_detail_card"
         />
         </div>
-        {/* <Button title="ddsssssssssssssss" /> */}
         <div className="vertical_container">
-          <h1>{RepoDetails.name}</h1>
-          <h4>{RepoDetails.description}</h4>
+          <h1>{name}</h1>
+          <h4>{description}</h4>
           <div className="star_issue_lastpush">
-            <h5>Stars : {RepoDetails.stargazers_count}</h5>
-            <h5>Issues : {RepoDetails.open_issues_count}</h5>
-            <h5>Last pushed : {RepoDetails.pushed_at} by {RepoDetails.owner.login}</h5>
+            <h5>Stars : {stargazersCount}</h5>
+            <h5>Issues : {openIssuesCount}</h5>
+            <h5>Last pushed : {pushedAt} by {login}</h5>
           </div>
         </div>
         <div className="indetail_card_view">
