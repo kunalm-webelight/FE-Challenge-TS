@@ -3,44 +3,53 @@ import "./App.css";
 import Counter from "./container/features/main";
 import DetailCard from "./components/Detailcard";
 import { useEffect, useState } from "react";
-import moment from "moment";
-import axios from "axios";
 
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchRepo, fetchRepoFailure, fetchRepoSuccess,getRepoData } from './redux/repo/repoActions';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchRepo,
+  fetchRepoFailure,
+  fetchRepoSuccess,
+  getRepoData,
+} from "./redux/repo/repoActions";
 import { AppDispatch } from "./redux/repoStore";
-import { createLogicalAnd } from "typescript";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 interface DetailCards {
-  avatarUrl: string,
-  name: string,
-  description: string,
-  stargazersCount: number,
-  openIssuesCount: number,
-  pushedAt: string,
-  login: string,
+  avatarUrl: string;
+  name: string;
+  description: string;
+  stargazersCount: number;
+  openIssuesCount: number;
+  pushedAt: string;
+  login: string;
 }
 
-
 function App() {
-  // const [repoData, setrepoData] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
-  const repoDataFromRedux = useSelector((state:any)=> state?.repo);
+  const repoDataFromRedux = useSelector((state: any) => state?.repo);
+  const [time, setTime] = React.useState('');
 
- 
+  const handleChange = (event: SelectChangeEvent) => {
+    console.log("got this",event.target.value)
+    setTime(event.target.value);
+  };
+
   const finalData = repoDataFromRedux.map((item: any) => {
     return {
-    avatarUrl: item.owner.avatar_url,
-    name: item.name,
-    description: item.description,
-    stargazersCount: item.stargazers_count,
-    openIssuesCount: item.open_issues_count,
-    pushedAt: item.pushed_at,
-    login: item.owner.login,
-}});
-
+      avatarUrl: item.owner.avatar_url,
+      name: item.name,
+      description: item.description,
+      stargazersCount: item.stargazers_count,
+      openIssuesCount: item.open_issues_count,
+      pushedAt: item.pushed_at,
+      login: item.owner.login,
+    };
+  });
 
   // const getRepoData = async () => {
   //   dispatch(fetchRepo());
@@ -69,9 +78,12 @@ function App() {
 
   const handleInfiniteScroll = async () => {
     try {
-      if((window.innerHeight+document.documentElement.scrollTop + 1)>=document.documentElement.scrollHeight){
+      if (
+        window.innerHeight + document.documentElement.scrollTop + 1 >=
+        document.documentElement.scrollHeight
+      ) {
         setLoading(true);
-        setPage((prev)=>prev+1)
+        setPage((prev) => prev + 1);
       }
     } catch (error) {
       console.log(error);
@@ -80,25 +92,40 @@ function App() {
 
   useEffect(() => {
     window.addEventListener("scroll", handleInfiniteScroll);
-    return()=>window.removeEventListener("scroll",handleInfiniteScroll);
+    return () => window.removeEventListener("scroll", handleInfiniteScroll);
   }, []); //first render
 
   useEffect(() => {
-    // getRepoData();
-    dispatch(getRepoData(page));
+    dispatch(getRepoData(repoDataFromRedux, page));
   }, [page]); // first render
+
+  let opvalue;
 
   return (
     <div className="App">
-      <Counter />
+      {/* <Counter /> */}
+      
+      <FormControl sx={{m:1,minWidth:80}}>
+        <InputLabel id="demo-simple-select-label">Last</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          label="Last"
+          value={time}
+          onChange={handleChange}
+        >
+          <MenuItem value="1 week">1 Week</MenuItem>
+          <MenuItem value="2 weeks">2 Weeks</MenuItem>
+          <MenuItem value="1 month">1 Month</MenuItem>
+        </Select>
+      </FormControl>
 
       {finalData?.map((repo: DetailCards) => {
         return <DetailCard RepoDetails={repo} />;
       })}
-      {loading&&<h1>Fetching more repos...</h1>}
+      {loading && <h1>Fetching more repos...</h1>}
     </div>
   );
 }
 
 export default App;
-//enum ,interface  examples

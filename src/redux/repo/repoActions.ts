@@ -26,7 +26,7 @@ export const fetchRepoFailure = (err: any) => {
   };
 };
 
-export const getRepoData = (page:number) => {
+export const getRepoData = (prevdata:[],page:number) => {
   // dispatch(fetchRepo()); 
   // const today = new Date();
   // const currentDate = moment(today).format("YYYY-MM-DD");
@@ -62,7 +62,7 @@ export const getRepoData = (page:number) => {
     try {
       const response = await axios.get(url);
       const data = response.data.items;
-      dispatch(fetchRepoSuccess(data));
+      dispatch(fetchRepoSuccess([...prevdata,...data]));
     } catch (error) {
       dispatch(fetchRepoFailure(error));
     }
