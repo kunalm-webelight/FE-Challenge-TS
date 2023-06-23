@@ -1,21 +1,17 @@
-import React from "react";
+import React, { Fragment } from "react";
 import "./App.css";
 import Counter from "./container/features/main";
 import DetailCard from "./components/Detailcard";
 import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchRepo,
-  fetchRepoFailure,
-  fetchRepoSuccess,
-  getRepoData,
-} from "./redux/repo/repoActions";
+import { getRepoData, setTime } from "./redux/repo/repoActions";
 import { AppDispatch } from "./redux/repoStore";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import moment from "moment";
 
 interface DetailCards {
   avatarUrl: string;
@@ -32,14 +28,21 @@ function App() {
   const [loading, setLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
   const repoDataFromRedux = useSelector((state: any) => state?.repo);
-  const [time, setTime] = React.useState('');
+  const timeFromRedux = useSelector((state: any) => state?.time);
+
+  const date = moment()
+    .subtract(timeFromRedux, "days")
+    .format("YYYY-MM-DD");
+  console.log(date,"date")
 
   const handleChange = (event: SelectChangeEvent) => {
-    console.log("got this",event.target.value)
-    setTime(event.target.value);
+    const time = event.target.value;
+    dispatch(setTime(time))
+    console.log(repoDataFromRedux)
+    dispatch(getRepoData(repoDataFromRedux, page, date));
   };
 
-  const finalData = repoDataFromRedux.map((item: any) => {
+  const finalData = repoDataFromRedux?.map((item: any) => {
     return {
       avatarUrl: item.owner.avatar_url,
       name: item.name,
@@ -50,31 +53,6 @@ function App() {
       login: item.owner.login,
     };
   });
-
-  // const getRepoData = async () => {
-  //   dispatch(fetchRepo());
-  //   const today = new Date();
-  //   const currentDate = moment(today).format("YYYY-MM-DD");
-  //   const yesterday = moment(currentDate)
-  //     .subtract(1, "day")
-  //     .format("YYYY-MM-DD");
-  //   let url = `https://api.github.com/search/repositories?q=created:>${yesterday}&sort=stars&order=desc&page=${page}`;
-  //   //loading overloaded data from redux, need to handle it
-  //   axios
-  //     .get(url)
-  //     .then((res) => {
-  //       console.log(res,"res")
-  //       const jsondata = res.data;
-  //       const data = jsondata.items;
-  //       dispatch(fetchRepoSuccess(data))
-  //       // setrepoData((prevdata)=>[...prevdata,...data]);
-  //       // setLoading(false);
-  //     })
-  //     .catch((err) =>{
-  //       console.log(err)
-  //       dispatch(fetchRepoFailure(err))
-  //     } );
-  // };
 
   const handleInfiniteScroll = async () => {
     try {
@@ -96,32 +74,40 @@ function App() {
   }, []); //first render
 
   useEffect(() => {
-    dispatch(getRepoData(repoDataFromRedux, page));
+    // dispatch(getRepoData(repoDataFromRedux, page));
+    dispatch(getRepoData(repoDataFromRedux, page, date));
   }, [page]); // first render
 
-  let opvalue;
+  useEffect(() => {
+    // dispatch(getRepoData(repoDataFromRedux, page));
+    dispatch(getRepoData(repoDataFromRedux, page, date));
+  }, [timeFromRedux]); // first render
 
   return (
     <div className="App">
       {/* <Counter /> */}
-      
-      <FormControl sx={{m:1,minWidth:80}}>
+
+      <FormControl sx={{ m: 1, minWidth: 80 }}>
         <InputLabel id="demo-simple-select-label">Last</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           label="Last"
-          value={time}
+          value={timeFromRedux}
           onChange={handleChange}
         >
-          <MenuItem value="1 week">1 Week</MenuItem>
-          <MenuItem value="2 weeks">2 Weeks</MenuItem>
-          <MenuItem value="1 month">1 Month</MenuItem>
+          <MenuItem value={7}>1 Week</MenuItem>
+          <MenuItem value={14}>2 Weeks</MenuItem>
+          <MenuItem value={30}>1 Month</MenuItem>
         </Select>
       </FormControl>
 
-      {finalData?.map((repo: DetailCards) => {
-        return <DetailCard RepoDetails={repo} />;
+      {finalData?.map((repo: DetailCards, index: number) => {
+        return (
+          <Fragment key={index}>
+            <DetailCard RepoDetails={repo} />;
+          </Fragment>
+        );
       })}
       {loading && <h1>Fetching more repos...</h1>}
     </div>
