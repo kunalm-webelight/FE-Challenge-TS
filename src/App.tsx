@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import "./App.css";
-import Counter from "./container/features/main";
 import DetailCard from "./components/Detailcard";
 import { useEffect, useState } from "react";
 
@@ -30,16 +29,22 @@ function App() {
   const repoDataFromRedux = useSelector((state: any) => state?.repo);
   const timeFromRedux = useSelector((state: any) => state?.time);
 
-  const date = moment()
+  const fromDate = moment()
     .subtract(timeFromRedux, "days")
     .format("YYYY-MM-DD");
-  console.log(date,"date")
+  console.log(fromDate,"fromDate")
+
+  const toDate = moment()
+    .subtract(1, "day")
+    .format("YYYY-MM-DD");
+  console.log(toDate,"toDate")
 
   const handleChange = (event: SelectChangeEvent) => {
     const time = event.target.value;
     dispatch(setTime(time))
     console.log(repoDataFromRedux)
-    dispatch(getRepoData(repoDataFromRedux, page, date));
+    setPage(0);
+    dispatch(getRepoData([], 0, fromDate,toDate));
   };
 
   const finalData = repoDataFromRedux?.map((item: any) => {
@@ -71,22 +76,19 @@ function App() {
   useEffect(() => {
     window.addEventListener("scroll", handleInfiniteScroll);
     return () => window.removeEventListener("scroll", handleInfiniteScroll);
-  }, []); //first render
+  }, []); 
 
   useEffect(() => {
-    // dispatch(getRepoData(repoDataFromRedux, page));
-    dispatch(getRepoData(repoDataFromRedux, page, date));
-  }, [page]); // first render
+    dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
+  }, [page]); 
 
   useEffect(() => {
-    // dispatch(getRepoData(repoDataFromRedux, page));
-    dispatch(getRepoData(repoDataFromRedux, page, date));
-  }, [timeFromRedux]); // first render
+    dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
+  }, [timeFromRedux]); 
+
 
   return (
     <div className="App">
-      {/* <Counter /> */}
-
       <FormControl sx={{ m: 1, minWidth: 80 }}>
         <InputLabel id="demo-simple-select-label">Last</InputLabel>
         <Select
@@ -103,6 +105,7 @@ function App() {
       </FormControl>
 
       {finalData?.map((repo: DetailCards, index: number) => {
+        console.log("finalData",finalData)
         return (
           <Fragment key={index}>
             <DetailCard RepoDetails={repo} />;

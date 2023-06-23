@@ -4,10 +4,8 @@ import {
   FETCH_REPO_SUCCESS,
   SET_TIME,
 } from "./repoTypes";
-import moment from "moment";
 import axios from "axios";
 import { AppDispatch } from "../repoStore";
-import { useSelector } from "react-redux";
 
 export const fetchRepo = () => {
   return {
@@ -34,19 +32,19 @@ export const setTime = (time: string) => {
 };
 
 export const getRepoData =
-  (prevdata: [], page: number, time: string) =>
+  (prevdata: [], page: number, fromTime: string,toTime:string) =>
   async (dispatch: AppDispatch) => {
 
     // dispatch(setTime());
 
     dispatch(fetchRepo());
-
-      let url = `https://api.github.com/search/repositories?q=created:>${time}&sort=stars&order=desc&page=${page}`;
-      
+      let url = `https://api.github.com/search/repositories?q=created:${fromTime}..${toTime}&sort=stars&order=desc&page=${page}`;
     try {
       const response = await axios.get(url);
       const data = response.data.items;
+      console.log("merging data...")
       dispatch(fetchRepoSuccess([...prevdata, ...data]));
+      console.log("merged data!")
     } catch (error) {
       dispatch(fetchRepoFailure(error));
     }
