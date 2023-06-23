@@ -20,34 +20,45 @@ interface DetailCards {
   openIssuesCount: number;
   pushedAt: string;
   login: string;
+
 }
+interface ApiItemType{
+  owner: {avatar_url: string, login: string};
+  stargazers_count: number;
+  name: string;
+  description: string;
+  open_issues_count: number;
+  pushed_at: string;
+}
+interface StateType {
+  loading: boolean;
+  repo: [];
+  error: string;
+  time: number;
+};
 
 function App() {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const dispatch: AppDispatch = useDispatch();
-  const repoDataFromRedux = useSelector((state: any) => state?.repo);
-  const timeFromRedux = useSelector((state: any) => state?.time);
+  const repoDataFromRedux = useSelector((state: StateType) => state?.repo);
+  const timeFromRedux = useSelector((state: StateType) => state?.time);
 
   const fromDate = moment()
     .subtract(timeFromRedux, "days")
     .format("YYYY-MM-DD");
-  console.log(fromDate,"fromDate")
 
   const toDate = moment()
     .subtract(1, "day")
     .format("YYYY-MM-DD");
-  console.log(toDate,"toDate")
 
   const handleChange = (event: SelectChangeEvent) => {
     const time = event.target.value;
     dispatch(setTime(time))
-    console.log(repoDataFromRedux)
     setPage(0);
     dispatch(getRepoData([], 0, fromDate,toDate));
   };
-
-  const finalData = repoDataFromRedux?.map((item: any) => {
+  const finalData = repoDataFromRedux?.map((item: ApiItemType) => {
     return {
       avatarUrl: item.owner.avatar_url,
       name: item.name,
@@ -69,7 +80,7 @@ function App() {
         setPage((prev) => prev + 1);
       }
     } catch (error) {
-      console.log(error);
+      setLoading(false);
     }
   };
 
@@ -82,9 +93,9 @@ function App() {
     dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
   }, [page]); 
 
-  useEffect(() => {
-    dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
-  }, [timeFromRedux]); 
+  // useEffect(() => {
+  //   dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
+  // }, [timeFromRedux]); 
 
 
   return (
@@ -95,7 +106,7 @@ function App() {
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           label="Last"
-          value={timeFromRedux}
+          value={timeFromRedux.toString()}
           onChange={handleChange}
         >
           <MenuItem value={7}>1 Week</MenuItem>
@@ -105,7 +116,6 @@ function App() {
       </FormControl>
 
       {finalData?.map((repo: DetailCards, index: number) => {
-        console.log("finalData",finalData)
         return (
           <Fragment key={index}>
             <DetailCard RepoDetails={repo} />;

@@ -42,9 +42,7 @@ export const getRepoData =
     try {
       const response = await axios.get(url);
       const data = response.data.items;
-      console.log("merging data...")
       dispatch(fetchRepoSuccess([...prevdata, ...data]));
-      console.log("merged data!")
     } catch (error) {
       dispatch(fetchRepoFailure(error));
     }
