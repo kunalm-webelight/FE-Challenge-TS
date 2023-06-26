@@ -3,6 +3,7 @@ import {
   FETCH_REPO_FAILURE,
   FETCH_REPO_SUCCESS,
   SET_TIME,
+  SET_LOADING,
 } from "./repoTypes";
 import axios from "axios";
 import { AppDispatch } from "../repoStore";
@@ -30,7 +31,12 @@ export const setTime = (time: string) => {
     payload: time,
   };
 };
-
+export const setLoading = (isLoading: boolean) => {
+  return {
+    type: SET_LOADING,
+    payload: isLoading,
+  };
+};
 export const getRepoData =
   (prevdata: [], page: number, fromTime: string,toTime:string) =>
   async (dispatch: AppDispatch) => {

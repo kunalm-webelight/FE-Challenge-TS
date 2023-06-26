@@ -3,6 +3,7 @@ import {
   FETCH_REPO_FAILURE,
   FETCH_REPO_SUCCESS,
   SET_TIME,
+  SET_LOADING,
 } from "./repoTypes";
 // =============================INITIAL STATE======================================================
 const initialstate = {
@@ -44,6 +45,11 @@ const repoReducer = (state = initialstate, action: ActionType) => {
         ...state,
         repo:[],
         time: action.payload,
+      };
+    case SET_LOADING:
+      return {
+        ...state,
+        loading:action.payload,
       };
     default:
       return state;

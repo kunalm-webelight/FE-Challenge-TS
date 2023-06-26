@@ -4,7 +4,7 @@ import DetailCard from "./components/Detailcard";
 import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { getRepoData, setTime } from "./redux/repo/repoActions";
+import { getRepoData, setTime ,setLoading} from "./redux/repo/repoActions";
 import { AppDispatch } from "./redux/repoStore";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -39,24 +39,34 @@ interface StateType {
 
 function App() {
   const [page, setPage] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const loading = useSelector((state: StateType) => state?.loading);
   const dispatch: AppDispatch = useDispatch();
   const repoDataFromRedux = useSelector((state: StateType) => state?.repo);
   const timeFromRedux = useSelector((state: StateType) => state?.time);
 
-  const fromDate = moment()
-    .subtract(timeFromRedux, "days")
-    .format("YYYY-MM-DD");
+  const getDate = (days:number)=>{
+    let date;
+    if(days==1){
+      date =moment()
+      .subtract(days, "day")
+      .format("YYYY-MM-DD");
+    }else{
+      date =moment()
+      .subtract(days, "days")
+      .format("YYYY-MM-DD");
+    }
+    return date;
+  }
+  const fromDate = getDate(timeFromRedux);
 
-  const toDate = moment()
-    .subtract(1, "day")
-    .format("YYYY-MM-DD");
+  const toDate = getDate(1);
 
   const handleChange = (event: SelectChangeEvent) => {
     const time = event.target.value;
     dispatch(setTime(time))
     setPage(0);
-    dispatch(getRepoData([], 0, fromDate,toDate));
+    const from_Date = getDate(parseInt(time));
+    dispatch(getRepoData([], 0, from_Date,toDate));
   };
   const finalData = repoDataFromRedux?.map((item: ApiItemType) => {
     return {
@@ -76,11 +86,11 @@ function App() {
         window.innerHeight + document.documentElement.scrollTop + 1 >=
         document.documentElement.scrollHeight
       ) {
-        setLoading(true);
+        dispatch(setLoading(true));
         setPage((prev) => prev + 1);
       }
     } catch (error) {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
   };
 
@@ -92,10 +102,6 @@ function App() {
   useEffect(() => {
     dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
   }, [page]); 
-
-  // useEffect(() => {
-  //   dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
-  // }, [timeFromRedux]); 
 
 
   return (
