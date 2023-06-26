@@ -1,17 +1,24 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useRef } from "react";
 import "./App.css";
 import DetailCard from "./components/Detailcard";
+import Graphcard from "./components/Graphcard";
 import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { getRepoData, setTime ,setLoading} from "./redux/repo/repoActions";
+import { getRepoData, setTime, setLoading } from "./redux/repo/repoActions";
+//=====================dropdown imports====================
 import { AppDispatch } from "./redux/repoStore";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+// =====================Moment=============================
 import moment from "moment";
-
+//=====================accordion imports====================
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 interface DetailCards {
   avatarUrl: string;
   name: string;
@@ -20,10 +27,9 @@ interface DetailCards {
   openIssuesCount: number;
   pushedAt: string;
   login: string;
-
 }
-interface ApiItemType{
-  owner: {avatar_url: string, login: string};
+interface ApiItemType {
+  owner: { avatar_url: string; login: string };
   stargazers_count: number;
   name: string;
   description: string;
@@ -35,7 +41,7 @@ interface StateType {
   repo: [];
   error: string;
   time: number;
-};
+}
 
 function App() {
   const [page, setPage] = useState(0);
@@ -44,29 +50,27 @@ function App() {
   const repoDataFromRedux = useSelector((state: StateType) => state?.repo);
   const timeFromRedux = useSelector((state: StateType) => state?.time);
 
-  const getDate = (days:number)=>{
+ 
+
+  const getDate = (days: number) => {
     let date;
-    if(days==1){
-      date =moment()
-      .subtract(days, "day")
-      .format("YYYY-MM-DD");
-    }else{
-      date =moment()
-      .subtract(days, "days")
-      .format("YYYY-MM-DD");
+    if (days === 1) {
+      date = moment().subtract(days, "day").format("YYYY-MM-DD");
+    } else {
+      date = moment().subtract(days, "days").format("YYYY-MM-DD");
     }
     return date;
-  }
+  };
   const fromDate = getDate(timeFromRedux);
 
   const toDate = getDate(1);
 
   const handleChange = (event: SelectChangeEvent) => {
     const time = event.target.value;
-    dispatch(setTime(time))
+    dispatch(setTime(time));
     setPage(0);
     const from_Date = getDate(parseInt(time));
-    dispatch(getRepoData([], 0, from_Date,toDate));
+    dispatch(getRepoData([], 0, from_Date, toDate));
   };
   const finalData = repoDataFromRedux?.map((item: ApiItemType) => {
     return {
@@ -97,12 +101,11 @@ function App() {
   useEffect(() => {
     window.addEventListener("scroll", handleInfiniteScroll);
     return () => window.removeEventListener("scroll", handleInfiniteScroll);
-  }, []); 
+  }, []);
 
   useEffect(() => {
-    dispatch(getRepoData(repoDataFromRedux, page, fromDate,toDate));
-  }, [page]); 
-
+    dispatch(getRepoData(repoDataFromRedux, page, fromDate, toDate));
+  }, [page]);
 
   return (
     <div className="App">
@@ -124,7 +127,18 @@ function App() {
       {finalData?.map((repo: DetailCards, index: number) => {
         return (
           <Fragment key={index}>
-            <DetailCard RepoDetails={repo} />;
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <DetailCard RepoDetails={repo} />
+              </AccordionSummary>
+              <AccordionDetails>
+              <Graphcard RepoDetails={repo}/>
+              </AccordionDetails>
+            </Accordion>
           </Fragment>
         );
       })}
