@@ -19,6 +19,7 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Box, Typography } from "@mui/material";
 interface DetailCards {
   avatarUrl: string;
   name: string;
@@ -27,6 +28,7 @@ interface DetailCards {
   openIssuesCount: number;
   pushedAt: string;
   login: string;
+  id: number;
 }
 interface ApiItemType {
   owner: { avatar_url: string; login: string };
@@ -35,6 +37,7 @@ interface ApiItemType {
   description: string;
   open_issues_count: number;
   pushed_at: string;
+  id: number;
 }
 interface StateType {
   loading: boolean;
@@ -45,12 +48,14 @@ interface StateType {
 
 function App() {
   const [page, setPage] = useState(0);
+  const [isOpen,setIsOpen] = useState<any>({
+    index: null,
+    label:"",
+  });
   const loading = useSelector((state: StateType) => state?.loading);
   const dispatch: AppDispatch = useDispatch();
   const repoDataFromRedux = useSelector((state: StateType) => state?.repo);
   const timeFromRedux = useSelector((state: StateType) => state?.time);
-
- 
 
   const getDate = (days: number) => {
     let date;
@@ -72,6 +77,10 @@ function App() {
     const from_Date = getDate(parseInt(time));
     dispatch(getRepoData([], 0, from_Date, toDate));
   };
+  const handleAccordionClick = (indexrec: number,lablerec:string)=>{
+    setIsOpen({index:indexrec,label:lablerec});
+    console.log(indexrec,lablerec);
+  }
   const finalData = repoDataFromRedux?.map((item: ApiItemType) => {
     return {
       avatarUrl: item.owner.avatar_url,
@@ -81,6 +90,7 @@ function App() {
       openIssuesCount: item.open_issues_count,
       pushedAt: item.pushed_at,
       login: item.owner.login,
+      id: item.id,
     };
   });
 
@@ -124,19 +134,27 @@ function App() {
         </Select>
       </FormControl>
 
-      {finalData?.map((repo: DetailCards, index: number) => {
+      {finalData?.map((repo: DetailCards,index :number) => {
         return (
-          <Fragment key={index}>
-            <Accordion>
+          <Fragment key={repo.id}>
+            {/* onClick={()=>{handleAccordionClick(index,"")}} */}
+            <Accordion >
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
+                expandIcon={
+                <ExpandMoreIcon />}
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
                 <DetailCard RepoDetails={repo} />
               </AccordionSummary>
               <AccordionDetails>
-              <Graphcard RepoDetails={repo}/>
+                <Box sx={{gap:2, display:"flex"}}>  
+                  <Typography onClick={()=>{handleAccordionClick(index,"commits")}}>Commits</Typography>
+                  <Typography onClick={()=>{handleAccordionClick(index,"deletions")}}>Deletions</Typography>
+                  <Typography onClick={()=>{handleAccordionClick(index,"additions")}}>Additions</Typography>
+                </Box>
+
+              <Graphcard RepoDetails={repo} index={index} isOpen={isOpen}/>
               </AccordionDetails>
             </Accordion>
           </Fragment>

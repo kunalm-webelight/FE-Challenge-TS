@@ -3,7 +3,6 @@ import "./detailcard.css";
 
 
 export default function DetailCard({RepoDetails}:any) {
-  console.log()
   const {avatarUrl,name,description,stargazersCount,openIssuesCount,pushedAt,login} = RepoDetails || {}
 
   return (
