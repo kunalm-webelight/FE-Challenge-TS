@@ -11,6 +11,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
     yAxisText: string;
     seriesName: string;
     data: number[];
+    categories: string[];
   }
   const [firstdata, setFirstData] = useState<FirstDataState>(
     {
@@ -18,6 +19,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       yAxisText: "",
       seriesName: "",
       data: [],
+      categories: [],
     }
   );
 
@@ -37,17 +39,21 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
   const getCommitActivityAPI = async (url: string) => {
     const data = await axios.get(url);
     const finaldata = data.data;
+    console.log(finaldata);
     const arr: number[] = [];
+    const week: string[] = [];
     finaldata.length > 0 &&
-      finaldata?.map((item: any) => {
-        arr.push(item?.total);
+      finaldata.map((item: any) => {
+        arr.push(item.total);
+        week.push(new Date(item.week * 1000).toLocaleString());
       });
     setFirstData(prevdata => ({
       ...prevdata,
       data: arr,
       text: "Commits",
       yAxisText: "No Of Commits",
-      seriesName: "Commit(s)"
+      seriesName: "Commit(s)",
+      categories: week
     }));
   }
 
@@ -55,17 +61,20 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
     const data = await axios.get(url);
     const finaldata = data.data;
     const arr: number[] = [];
+    const week: string[] = [];
     console.log(finaldata);
     finaldata.length > 0 &&
       finaldata?.map((item: Array<number>) => {
         arr.push(Math.abs(item[2]));
+        week.push(new Date(item[0] * 1000).toLocaleString());
       });
     setFirstData(prevdata => ({
       ...prevdata,
       data: arr,
       text: "Deletions",
       yAxisText: "No Of Deletions",
-      seriesName: "Deletion(s)"
+      seriesName: "Deletion(s)",
+      categories: week,
     }));
   }
   const getAdditionsActivityAPI = async (url: string) => { //
@@ -73,17 +82,20 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
     const finaldata = data.data;
 
     const arr: number[] = [];
+    const week: string[] = [];
     console.log(finaldata);
     finaldata.length > 0 &&
       finaldata?.map((item: Array<number>) => {
         arr.push(item[1]);
+        week.push(new Date(item[0] * 1000).toLocaleString());
       });
     setFirstData(prevdata => ({
       ...prevdata,
       data: arr,
       text: "Additions",
       yAxisText: "No Of Additions",
-      seriesName: "Addition(s)"
+      seriesName: "Addition(s)",
+      categories: week,
     }));
   }
 
@@ -134,6 +146,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       text: firstdata.text,
     },
     xAxis: {
+      categories: firstdata.categories,
       allowDecimals: false,
       accessibility: {
         rangeDescription: "Range: 1 to 52.",
@@ -144,9 +157,8 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
         text: firstdata.yAxisText,
       },
     },
-
     tooltip: {
-      pointFormat: "<b>{point.y:,.0f}</b> Additions in {point.x}th week",
+      pointFormat: "<b>{point.y:,.0f}</b> in {point.x}th week",
     },
     plotOptions: {
       area: {
