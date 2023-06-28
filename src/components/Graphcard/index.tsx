@@ -5,7 +5,22 @@ import HighchartsReact from "highcharts-react-official";
 import axios from "axios";
 
 export default function Graphcard({ RepoDetails, index, isOpen }: any) {
-  const [data, setData] = useState<number[]>([]);
+  // const [data, setFirstData] = useState<number[]>([]);
+  interface FirstDataState {
+    text: string;
+    yAxisText: string;
+    seriesName: string;
+    data: number[];
+  }
+  const [firstdata, setFirstData] = useState<FirstDataState>(
+    {
+      text: "",
+      yAxisText: "",
+      seriesName: "",
+      data: [],
+    }
+  );
+
   const [seriesData, setSeriesData] = useState<Highcharts.SeriesOptionsType[]>([]);
   const { name, login } = RepoDetails || {};
   // const getApiData = async () => {
@@ -16,7 +31,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
   //     finaldata?.map((item: any) => {
   //       arr.push(item?.total);
   //     });
-  //   setData([...arr]);
+  //   setFirstData([...arr]);
   // };
 
   const getCommitActivityAPI = async (url: string) => {
@@ -27,8 +42,14 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       finaldata?.map((item: any) => {
         arr.push(item?.total);
       });
-    setData([...arr]);
-  };
+    setFirstData(prevdata => ({
+      ...prevdata,
+      data: arr,
+      text: "Commits",
+      yAxisText: "No Of Commits",
+      seriesName: "Commit(s)"
+    }));
+  }
 
   const getDeletionsActivityAPI = async (url: string) => { //
     const data = await axios.get(url);
@@ -39,7 +60,13 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       finaldata?.map((item: Array<number>) => {
         arr.push(Math.abs(item[2]));
       });
-    setData(arr);
+    setFirstData(prevdata => ({
+      ...prevdata,
+      data: arr,
+      text: "Deletions",
+      yAxisText: "No Of Deletions",
+      seriesName: "Deletion(s)"
+    }));
   }
   const getAdditionsActivityAPI = async (url: string) => { //
     const data = await axios.get(url);
@@ -51,7 +78,13 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       finaldata?.map((item: Array<number>) => {
         arr.push(item[1]);
       });
-    setData(arr);
+    setFirstData(prevdata => ({
+      ...prevdata,
+      data: arr,
+      text: "Additions",
+      yAxisText: "No Of Additions",
+      seriesName: "Addition(s)"
+    }));
   }
 
   const getContributorsAPI = async (url: string) => { //
@@ -98,7 +131,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       type: "line",
     },
     title: {
-      text: "My chart",
+      text: firstdata.text,
     },
     xAxis: {
       allowDecimals: false,
@@ -108,11 +141,12 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
     },
     yAxis: {
       title: {
-        text: "Commits",
+        text: firstdata.yAxisText,
       },
     },
+
     tooltip: {
-      pointFormat: "<b>{point.y:,.0f}</b>commits in {point.x}th week",
+      pointFormat: "<b>{point.y:,.0f}</b> Additions in {point.x}th week",
     },
     plotOptions: {
       area: {
@@ -131,57 +165,57 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
     },
     series: [
       {
-        name: "commit(s)",
+        name: firstdata.seriesName,
         // type: "line",
-        data: [...data],
+        data: [...firstdata.data],
       },
     ],
   };
 
-  const DeleteActivityOptions = {
-    chart: {
-      type: "bar",
-    },
-    title: {
-      text: "Deletions Bar chart",
-    },
-    xAxis: {
-      allowDecimals: false,
-      accessibility: {
-        rangeDescription: "Range: 1 to 52.",
-      },
-    },
-    yAxis: {
-      title: {
-        text: "Deletions",
-      },
-    },
-    tooltip: {
-      pointFormat: "<b>{point.y:,.0f}</b>Deletions in {point.x}th week",
-    },
-    plotOptions: {
-      area: {
-        pointStart: 1,
-        marker: {
-          enabled: false,
-          symbol: "circle",
-          radius: 2,
-          states: {
-            hover: {
-              enabled: true,
-            },
-          },
-        },
-      },
-    },
-    series: [
-      {
-        name: "commit(s)",
-        // type: "line",
-        data: [...data],
-      },
-    ],
-  };
+  // const DeleteActivityOptions = {
+  //   chart: {
+  //     type: "bar",
+  //   },
+  //   title: {
+  //     text: "Deletions Bar chart",
+  //   },
+  //   xAxis: {
+  //     allowDecimals: false,
+  //     accessibility: {
+  //       rangeDescription: "Range: 1 to 52.",
+  //     },
+  //   },
+  //   yAxis: {
+  //     title: {
+  //       text: "Deletions",
+  //     },
+  //   },
+  //   tooltip: {
+  //     pointFormat: "<b>{point.y:,.0f}</b>Deletions in {point.x}th week",
+  //   },
+  //   plotOptions: {
+  //     area: {
+  //       pointStart: 1,
+  //       marker: {
+  //         enabled: false,
+  //         symbol: "circle",
+  //         radius: 2,
+  //         states: {
+  //           hover: {
+  //             enabled: true,
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  //   series: [
+  //     {
+  //       name: "commit(s)",
+  //       // type: "line",
+  //       data: [...data],
+  //     },
+  //   ],
+  // };
 
   const contributorsActivityOptions = {//
     chart: {
