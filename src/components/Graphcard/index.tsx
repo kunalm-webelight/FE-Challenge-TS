@@ -23,7 +23,12 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
     }
   );
 
-  const [seriesData, setSeriesData] = useState<Highcharts.SeriesOptionsType[]>([]);
+  const [seriesData, setSeriesData] = useState(
+    {
+      data: [],
+      categories: [],
+    }
+  );
   const { name, login } = RepoDetails || {};
   // const getApiData = async () => {
   //   const url = `https://api.github.com/repos/Chat2DB/Chat2DB/stats/commit_activity`;
@@ -39,7 +44,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
   const getCommitActivityAPI = async (url: string) => {
     const data = await axios.get(url);
     const finaldata = data.data;
-    console.log(finaldata);
+    // console.log(finaldata);
     const arr: number[] = [];
     const week: string[] = [];
     finaldata.length > 0 &&
@@ -62,7 +67,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
     const finaldata = data.data;
     const arr: number[] = [];
     const week: string[] = [];
-    console.log(finaldata);
+    // console.log(finaldata);
     finaldata.length > 0 &&
       finaldata?.map((item: Array<number>) => {
         arr.push(Math.abs(item[2]));
@@ -83,7 +88,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
 
     const arr: number[] = [];
     const week: string[] = [];
-    console.log(finaldata);
+    // console.log(finaldata);
     finaldata.length > 0 &&
       finaldata?.map((item: Array<number>) => {
         arr.push(item[1]);
@@ -104,13 +109,29 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       .then(response => response.json())
       .then(data => {
         // Prepare data for Highcharts
-        const myseriesData = data.map((item: any) => ({
-          x: item.weeks.map((week: any) => new Date(week.w * 1000).toLocaleString()),
-          y: item.weeks.map((week: any) => week.a),
-          name: item.author.login
+        // x: item.weeks.map((week: any) => new Date(week.w * 1000).toLocaleString()),
+        console.log(data);
+        // const additionData = data.map((item: any) => (
+        //   item.weeks.map((week: any) => week.a)
+        // ));
+        const additionData = data.map((obj: any) => ({
+          name: obj.author.login,
+          data: obj.weeks.map((week: any) => week.a)
         }));
-        setSeriesData(myseriesData);
-        console.log(myseriesData);
+        const catergoryData = data.map((obj: any) => (
+          // new Date(obj.weeks.w * 1000).toLocaleString()
+          obj.weeks.map((multipleweeks: any) => multipleweeks.w)
+        ));
+        console.log("graph data->", additionData);
+        console.log("times ", catergoryData);
+        setSeriesData(
+          {
+            ...seriesData,
+            data: additionData,
+            categories: catergoryData,
+          }
+        );
+        // console.log(myseriesData);
         // console.log(new Date(week.w * 1000).toLocaleString());
 
       });
@@ -237,7 +258,8 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
       text: 'GitHub Contributions'
     },
     xAxis: {
-      type: 'datetime',
+      categories: seriesData.categories,
+      // type: 'datetime',
       title: {
         text: 'Week'
       }
@@ -254,7 +276,7 @@ export default function Graphcard({ RepoDetails, index, isOpen }: any) {
         }
       }
     },
-    series: [...seriesData]
+    series: [...seriesData.data]
   }
   return (
     <>
